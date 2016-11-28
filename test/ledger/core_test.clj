@@ -30,13 +30,28 @@
       (is (= (:bal i) 450)))))
 
 (deftest test-text->entry
-  (testing "parse row"
-    (let [txt "-240 meds das bal 540"
+  (testing "plain expense"
+    (let [txt "-10 exp1"
+          entry (text->entry txt)]
+      (is (= 10 (:amt entry)))
+      (is (= "exp1" (:desc entry)))
+      (is (nil? (:bal entry)))
+      (is (nil? (:acct entry)))
+      (is (nil? (:for entry)))))
+  (testing "parse balance data"
+    (let [txt "-240 some exp desc bal 540"
           entry (text->entry txt)]
       (is (= 240 (:amt entry)))
       (is (= :debit (:txn entry)))
-      (is (= "meds das" (:desc entry)))
-      (is (= 540 (:bal entry))))))
+      (is (= "some exp desc" (:desc entry)))
+      (is (= 540 (:bal entry)))))
+  (testing "parse tag and mention data"
+    (let [txt "-4500 loan to @john #hdfc"
+          entry (text->entry txt)]
+      (is (= 4500 (:amt entry)))
+      (is (= "loan to" (:desc entry)))
+      (is (= "#hdfc" (:acct entry)))
+      (is (= "@john" (:for entry))))))
 
 (deftest test-text->date
   (let [year "2016"]
