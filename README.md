@@ -1,6 +1,6 @@
 # ledger
 
-A Clojure app designed to track the daily personal expense list using a text file on your phone or PC and stored in your own Google Drive XL worksheet.
+A Clojure app designed to track the daily personal expense list using a text file on your phone or PC and stored in your own Google Sheets.
 
 All expense and incomes are by default related to your wallet. Each line in the file relates to a single expense, income and or a balance checkpoint. All of the day's entries are headlined by the `dd-mmm` format. All expenses start with a `-` (minus), all incomes start with a `+`.
 
@@ -32,7 +32,22 @@ A sample tracking text file looks like this
 
 ## Usage
 
-Need the command to upload the parsed file entries to your Google Doc or output as a CSV.
+### To parse the file and display the CSV to stdout - one entry per line
+
+```
+lein run -- --file <FILE> --out csv
+```
+
+### To parse the file and upload the entries to Google Sheets - one entry per row
+
+To be able upload to Google Sheets
+- client_secret.json (For OAuth permission to Google Drive) and
+- spreadsheets.json (SpreadSheet ID and Worksheet name are needed)
+files need to be configured. The sample files are provided
+
+```
+lein run -- --file <FILE> --out gs
+```
 
 ## License
 
