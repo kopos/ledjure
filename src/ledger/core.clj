@@ -1,9 +1,6 @@
 (ns ledger.core
   (require [clojure.string :as s]
-           [clj-time.core :as t]
            [clj-time.format :as f]))
-
-(def current-year (t/year (t/now)))
 
 (def amt-re #"([-+*])?(\d+)")
 
@@ -18,11 +15,10 @@
   (map s/trim (s/split-lines (slurp file))))
 
 (defn text->date [text]
-  (str (f/unparse
-         (f/formatter "dd-MM")
-         (f/parse (f/formatter "dd-MMM") text))
-       "-"
-       current-year))
+  (f/parse (f/formatter "dd-MMM") text))
+
+(defn day-str [d]
+  (f/unparse (f/formatter "dd-MMM") d))
 
 (defn amt [a]
   (let [[_ t n] (re-matches #"([-+*])?(\d+)" a)]
@@ -38,8 +34,8 @@
 
   Each function returns a 2 tuple. The first item is accumulated and the second
   item passed as the argument to the next function
-  
-  Essentially |>> converts a function call flow from
+
+  Essentially |>> is a shortcut to compose functions with the given call flow from
 
   (let [[m1 t1] (f1 t)
         [m2 t2] (f2 t1)
@@ -99,9 +95,11 @@
            (info i))))
 
 (defn text->full-entry [txt date i]
-  (merge {:id i}
-         {:day date}
-         (text->entry txt)))
+  (let [fe (try (text->entry txt)
+              (catch Exception e {:desc txt :error (.getMessage e)}))]
+    (merge {:id i}
+           {:day date}
+           fe)))
 
 (defn lines->entries [lines]
   (loop [date nil
@@ -117,3 +115,7 @@
                  (rest s')
                  (conj entries (text->full-entry (first s') date' id))
                  (inc id))))))
+
+(defn sorted-entries [lines]
+  (let [entries (lines->entries lines)]
+    (sort-by (juxt :day :id) entries)))

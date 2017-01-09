@@ -54,15 +54,14 @@
       (is (= "@john" (:for entry))))))
 
 (deftest test-text->date
-  (let [year "2016"]
-    (testing  "dates parsing"
-      (is (= (text->date "02-jan") (str "02-01-" year)))
-      (is (= (text->date "02-january") (str "02-01-" year)))
-      (is (= (text->date "12-jan") (str "12-01-" year)))
-      (is (= (text->date "12-JAN") (str "12-01-" year)))
-      (is (= (text->date "29-Feb") (str "29-02-" year)))
-      (is (thrown? IllegalArgumentException (text->date "")))
-      (is (thrown? IllegalArgumentException (text->date "2-janry"))))))
+  (testing  "dates parsing"
+    (is (= (day-str (text->date "02-jan")) "02-Jan"))
+    (is (= (day-str (text->date "02-january")) "02-Jan"))
+    (is (= (day-str (text->date "12-jan")) "12-Jan"))
+    (is (= (day-str (text->date "12-JAN")) "12-Jan"))
+    (is (= (day-str (text->date "29-Feb")) "29-Feb"))
+    (is (thrown? IllegalArgumentException (text->date "")))
+    (is (thrown? IllegalArgumentException (text->date "2-janry")))))
 
 (deftest test-lines->entries
   (let [lines ["24-jan"
@@ -86,9 +85,9 @@
         (is true (apply <= (map #(:id %) entries))))
     (testing "testing that dates are assigned to entries correctly"
         ; First 2 entries are of 1st day
-        (is true (every? #(= (:day %) "24-01-2016") (take 2 entries)))
+        (is true (every? #(= (:day %) "24-01-2017") (take 2 entries)))
         ; Next 3 entries are of the 2nd day
-        (is true (every? #(= (:day %) "23-01-2016") (take-last 3 entries))))
+        (is true (every? #(= (:day %) "23-01-2017") (take-last 3 entries))))
     (testing "amounts are assigned correctly to entries as per order"
         (is (= 133 (:amt (get entries 0))))
         (is (= 56 (:amt (get entries 1))))
