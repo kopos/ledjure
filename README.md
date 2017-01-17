@@ -2,7 +2,7 @@
 
 A Clojure app designed to track the daily personal expense list using a text file on your phone or PC and stored in your own Google Sheets.
 
-All expense and incomes are by default related to your wallet. Each line in the file relates to a single expense, income and or a balance checkpoint. All of the day's entries are headlined by the `dd-mmm` format. All expenses start with a `-` (minus), all incomes start with a `+`.
+All expense and incomes are by default related to your wallet. Each line in the file relates to a single expense, income and or a balance checkpoint. All of the day's entries are headlined by the day in the `dd-mmm` format. All expenses start with a `-` (minus), all incomes start with a `+`.
 
 Each entry line tracks the following components
 
@@ -49,7 +49,19 @@ The sample file for client_secret.json is provided.
 ```
 lein run -- --file <FILE> --out gs --ssid <SPREAD-SHEET-ID> --name <SHEET-NAME>
 ```
+### Usage summary
+```
+$ lein run -- --help
 
+  -f, --file FILE       Input file for parsing
+  -o, --out OUT    csv  Output format
+  -s, --ssid SSID       Spread Sheet Id (Mandatory if output format is gs)
+  -n, --name NAME       Worksheet Name (Mandatory if ouput format is gs)
+  -v, --verbose         Verbosity level
+  -h, --help            Print this help
+
+Usage: lein run -- --file <FILE-PATH> --out [csv|gs] --ssid <SSID> --sname <NAME>
+```
 ## License
 
 This project was developed by Poorna Shashank and is licensed under Eclipse Public License either version 1.0 or (at your option) any later version
