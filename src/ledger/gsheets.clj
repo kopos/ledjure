@@ -5,8 +5,6 @@
 
 (def goog-creds-file "client_secret.json")
 
-(def spreadsheet-file "spreadsheets.json")
-
 (defn- parse-google-credentials [file]
   (let [cs-json (json/read-str (slurp file))
         cs (cs-json "installed")]
@@ -16,13 +14,10 @@
   (let [[client-id client-secret] (parse-google-credentials file)]
     (gs/build-service client-id client-secret)))
 
-(defn- get-spreadsheet-info [service file]
-  (let [ss-json (json/read-str (slurp file))
-        ssid (ss-json "spreadsheet-id")
-        sheet-name (ss-json "sheet-name")]
-    [ssid (gs/find-sheet-by-title service ssid sheet-name)]))
+(defn- get-spreadsheet-info [service ssid sheet-name]
+  [ssid (gs/find-sheet-by-title service ssid sheet-name)])
 
-(defn upload-data [rows]
+(defn upload-data [rows ssid sheet-name]
   (let [service (build-service-from-credentials goog-creds-file)
-        [ssid sid] (get-spreadsheet-info service spreadsheet-file)]
+        [ssid sid] (get-spreadsheet-info service ssid sheet-name)]
     (gs/write-sheet service ssid sid rows)))

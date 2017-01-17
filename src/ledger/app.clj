@@ -8,6 +8,8 @@
 
 (def required-opts #{:file})
 
+(def gs-required-opts #{:ssid :sname})
+
 (def cli-opts
   [["-f" "--file FILE" "Input file for parsing"
     :validate [#(.exists (io/as-file %)) "File does not exist"]]
@@ -15,6 +17,10 @@
     :id :out
     :default "csv"
     :validate [#(contains? #{"csv" "gs"} %) "Output format is invalid"]]
+   ["-s" "--ssid SSID" "Spread Sheet Id (Mandatory if output format is gs)"
+    :id :ssid]
+   ["-n" "--name NAME" "Worksheet Name (Mandatory if ouput format is gs)"
+    :id :sname]
    ["-v" "--verbose" "Verbosity level"
     :id :verbosity
     :default 0
@@ -24,6 +30,11 @@
 
 (defn missing-required? [opts]
   (not-every? opts required-opts))
+
+(defn missing-gs-required? [opts]
+  (if (= "gs" (:out opts))
+    (not-every? opts gs-required-opts)
+    false))
 
 (defn entry->list [entry]
   (if (contains? entry :error)
@@ -60,16 +71,16 @@
   (doseq [e entries]
     (println (join "," (entry->list e)))))
 
-(defn upload-to-google-sheets [entries]
+(defn upload-to-google-sheets [entries ssid sname]
   (println "Uploading to google sheets ...")
-  (upload-data (into [headers] (map entry->list entries)))
+  (upload-data (into [headers] (map entry->list entries)) ssid sname)
   (println "OK"))
 
 (def usage 
   (str "Usage: "
        "lein run -- "
        "--file <FILE-PATH> "
-       "--out gs"))
+       "--out [csv|gs] --ssid <SSID> --sname <NAME>"))
 
 (defn -main [& args]
   (let [{:keys [options arguments summary errors]} (parse-opts args cli-opts)]
@@ -77,7 +88,7 @@
       (println errors)
       (println usage)
       (System/exit 0))
-    (when (or (:help options) (missing-required? options))
+    (when (or (:help options) (missing-required? options) (missing-gs-required? options))
       (println summary)
       (println usage)
       (print options)
@@ -87,4 +98,4 @@
           entries (sorted-entries lines)]
       (condp = (:out options)
         "csv" (print-csv entries)
-        "gs" (upload-to-google-sheets entries)))))
+        "gs" (upload-to-google-sheets entries (:ssid options) (:sname options))))))

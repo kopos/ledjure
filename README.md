@@ -41,12 +41,13 @@ lein run -- --file <FILE> --out csv
 ### To parse the file and upload the entries to Google Sheets - one entry per row
 
 To be able upload to Google Sheets
-- client_secret.json (For OAuth permission to Google Drive) and
-- spreadsheets.json (SpreadSheet ID and Worksheet name are needed)
-files need to be configured. The sample files are provided
+- client_secret.json (For OAuth permission to Google Drive) file needs to be configured
+- Spread Sheet ID and Worksheet name are needed
+
+The sample file for client_secret.json is provided.
 
 ```
-lein run -- --file <FILE> --out gs
+lein run -- --file <FILE> --out gs --ssid <SPREAD-SHEET-ID> --name <SHEET-NAME>
 ```
 
 ## License
